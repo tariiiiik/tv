@@ -102,11 +102,10 @@
 
     <script>
         // CONFIGURATION DES VIDÉOS
-        // Vous pouvez changer les titres et les ID ici
         const APPROVED_VIDEOS = [
-            { title: "Colors", id: "2HNgd0n2h5Y" },
-            { title: "Cars", id: "gifwrHhhOCE" },
-            { title: "Lion and mouse", id: "-6H89G8Tn0E" }
+            { title: "Rick Astley", id: "dQw4w9WgXcQ" },
+            { title: "Gangnam Style", id: "9bZkp7q19f0" },
+            { title: "Despacito", id: "kJQP7kiw5Fk" }
         ];
 
         let currentIndex = 0;
@@ -115,14 +114,11 @@
         const grid = document.getElementById('videoGrid');
         APPROVED_VIDEOS.forEach((video, index) => {
             const card = document.createElement('div');
-            card.className = `video-card \${index === 0 ? 'focused' : ''}`;
-            card.id = `video-\${index}`;
+            card.className = "video-card" + (index === 0 ? " focused" : "");
+            card.id = "video-" + index;
             
-            // Version d'image plus propre et directe
-            card.innerHTML = `
-                <img class="video-thumb" src="https://youtube.com\${video.id}/hqdefault.jpg" alt="thumbnail">
-                <p>\${video.title}</p>
-            `;
+            // Code nettoyé de toute barre inversée
+            card.innerHTML = '<img class="video-thumb" src="https://youtube.com' + video.id + '/hqdefault.jpg" alt="thumbnail"><p>' + video.title + '</p>';
             
             card.addEventListener('click', function() {
                 playVideo(video.id);
@@ -141,7 +137,7 @@
             }
 
             const total = APPROVED_VIDEOS.length;
-            document.getElementById(`video-\${currentIndex}`).classList.remove('focused');
+            document.getElementById("video-" + currentIndex).classList.remove('focused');
 
             switch(e.keyCode) {
                 case 37:
@@ -155,7 +151,7 @@
                     break;
             }
 
-            document.getElementById(`video-\${currentIndex}`).classList.add('focused');
+            document.getElementById("video-" + currentIndex).classList.add('focused');
         });
 
         function playVideo(videoId) {
@@ -163,8 +159,8 @@
             const overlay = document.getElementById('player-overlay');
             const frame = document.getElementById('video-frame');
             
-            // CORRECTION ICI : Utilisation des backticks (`) pour intégrer correctement la variable videoId
-            frame.src = `https://youtube-nocookie.com{videoId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+            // Lien d'intégration officiel corrigé
+            frame.src = "https://youtube-nocookie.com" + videoId + "?autoplay=1&controls=1&rel=0&modestbranding=1";
             overlay.style.display = 'block';
         }
 
@@ -176,4 +172,3 @@
     </script>
 </body>
 </html>
-
