@@ -29,35 +29,59 @@
             flex-wrap: wrap;
             max-width: 90%;
         }
-        /* Transformation des blocs en vrais liens cliquables HTML */
         .video-card {
             background: #222;
             border: 4px solid transparent;
-            border-radius: 15px;
-            width: 280px;
+            border-radius: 20px;
+            width: 250px;
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             cursor: pointer;
             transition: transform 0.2s;
             padding: 15px;
-            text-decoration: none; /* Enleve le soulignement du lien */
-            display: block;
         }
         .video-card:hover, .video-card.focused {
             border-color: #ffffff;
             transform: scale(1.05);
             background: #333;
         }
+        /* Style adapté pour afficher de vraies images à la taille du bouton */
         .video-thumb {
             width: 100%;
-            height: 150px;
-            border-radius: 8px;
+            height: 130px;
+            border-radius: 10px;
             object-fit: cover;
+            margin-bottom: 10px;
+            background-color: #000;
         }
         .video-card p {
-            margin: 15px 0 0 0;
-            font-size: 1.1rem;
+            margin: 5px 0 0 0;
+            font-size: 1.2rem;
             font-weight: bold;
             color: #fff;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #player-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            display: none;
+            z-index: 9999;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </head>
@@ -66,40 +90,64 @@
     <h1>Vidéos Autorisées</h1>
     
     <div class="grid">
-        <!-- VIDÉO 1 : Utilisation d'un lien hypertexte standard vers YouTube -->
-        <a class="video-card focused" id="video-0" href="https://youtube.com">
-            <img class="video-thumb" src="https://youtube.com">
+        <!-- VIDÉO 1 -->
+        <div class="video-card focused" id="video-0" onclick="playVideo('dQw4w9WgXcQ')">
+            <!-- Miniature chargée via le proxy externe sécurisé DuckDuckGo -->
+            <img class="video-thumb" src="https://duckduckgo.com" alt="Miniature">
             <p>Rick Astley</p>
-        </a>
+        </div>
 
         <!-- VIDÉO 2 -->
-        <a class="video-card" id="video-1" href="https://youtube.com">
-            <img class="video-thumb" src="https://youtube.com">
+        <div class="video-card" id="video-1" onclick="playVideo('9bZkp7q19f0')">
+            <img class="video-thumb" src="https://duckduckgo.com" alt="Miniature">
             <p>Gangnam Style</p>
-        </a>
+        </div>
 
         <!-- VIDÉO 3 -->
-        <a class="video-card" id="video-2" href="https://youtube.com">
-            <img class="video-thumb" src="https://youtube.com">
+        <div class="video-card" id="video-2" onclick="playVideo('kJQP7kiw5Fk')">
+            <img class="video-thumb" src="https://duckduckgo.com" alt="Miniature">
             <p>Despacito</p>
-        </a>
+        </div>
+    </div>
+
+    <div id="player-overlay">
+        <iframe id="video-frame" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
 
     <script>
         let currentIndex = 0;
         const totalVideos = 3;
+        let isPlaying = false;
 
-        // Gestion simplifiée pour la télécommande de la TV
+        function playVideo(videoId) {
+            isPlaying = true;
+            document.getElementById('video-frame').src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&controls=1&rel=0";
+            document.getElementById('player-overlay').style.display = 'block';
+        }
+
+        function closeVideo() {
+            isPlaying = false;
+            document.getElementById('player-overlay').style.display = 'none';
+            document.getElementById('video-frame').src = ""; 
+        }
+
         document.addEventListener('keydown', function(e) {
+            if (isPlaying) {
+                if (e.keyCode === 10009 || e.key === "Backspace" || e.keyCode === 27) { 
+                    closeVideo();
+                    e.preventDefault();
+                }
+                return;
+            }
+
             document.getElementById("video-" + currentIndex).classList.remove('focused');
 
-            if (e.keyCode === 37) { // Gauche
+            if (e.keyCode === 37) {
                 if (currentIndex > 0) currentIndex--;
-            } else if (e.keyCode === 39) { // Droite
+            } else if (e.keyCode === 39) {
                 if (currentIndex < totalVideos - 1) currentIndex++;
-            } else if (e.keyCode === 13) { // Touche OK de la télécommande ou Entrée du PC
-                // Force l'ouverture du lien HTML
-                window.location.href = document.getElementById("video-" + currentIndex).href;
+            } else if (e.keyCode === 13) {
+                document.getElementById("video-" + currentIndex).click();
             }
 
             document.getElementById("video-" + currentIndex).classList.add('focused');
