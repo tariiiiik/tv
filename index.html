@@ -10,12 +10,15 @@
             background-color: #141414;
             color: #ffffff;
             font-family: Arial, sans-serif;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh; 
+            padding: 20px 0; /* Ajoute un espace de sécurité en haut et en bas sur mobile */
+            box-sizing: border-box;
         }
         h1 {
             font-size: 2.5rem;
