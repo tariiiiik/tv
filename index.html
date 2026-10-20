@@ -29,6 +29,7 @@
             flex-wrap: wrap;
             max-width: 90%;
         }
+        /* Transformation des blocs en vrais liens cliquables HTML */
         .video-card {
             background: #222;
             border: 4px solid transparent;
@@ -38,43 +39,25 @@
             cursor: pointer;
             transition: transform 0.2s;
             padding: 15px;
+            text-decoration: none; /* Enleve le soulignement du lien */
+            display: block;
         }
         .video-card:hover, .video-card.focused {
             border-color: #ffffff;
             transform: scale(1.05);
             background: #333;
         }
-        /* Style des vraies miniatures */
         .video-thumb {
             width: 100%;
             height: 150px;
             border-radius: 8px;
             object-fit: cover;
-            background-color: #000;
         }
         .video-card p {
             margin: 15px 0 0 0;
             font-size: 1.1rem;
             font-weight: bold;
             color: #fff;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        #player-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #000;
-            display: none;
-            z-index: 9999;
-        }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
         }
     </style>
 </head>
@@ -83,64 +66,40 @@
     <h1>Vidéos Autorisées</h1>
     
     <div class="grid">
-        <!-- VIDÉO 1 -->
-        <div class="video-card focused" id="video-0" onclick="playVideo('dQw4w9WgXcQ')">
-            <!-- Utilisation du domaine ://ytimg.com pour éviter les blocages d'images -->
-            <img class="video-thumb" src="https://://ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg" alt="thumbnail">
+        <!-- VIDÉO 1 : Utilisation d'un lien hypertexte standard vers YouTube -->
+        <a class="video-card focused" id="video-0" href="https://youtube.com">
+            <img class="video-thumb" src="https://youtube.com">
             <p>Rick Astley</p>
-        </div>
+        </a>
 
         <!-- VIDÉO 2 -->
-        <div class="video-card" id="video-1" onclick="playVideo('9bZkp7q19f0')">
-            <img class="video-thumb" src="https://://ytimg.com/vi/9bZkp7q19f0/hqdefault.jpg" alt="thumbnail">
+        <a class="video-card" id="video-1" href="https://youtube.com">
+            <img class="video-thumb" src="https://youtube.com">
             <p>Gangnam Style</p>
-        </div>
+        </a>
 
         <!-- VIDÉO 3 -->
-        <div class="video-card" id="video-2" onclick="playVideo('kJQP7kiw5Fk')">
-            <img class="video-thumb" src="https://://ytimg.com/vi/kJQP7kiw5Fk/hqdefault.jpg" alt="thumbnail">
+        <a class="video-card" id="video-2" href="https://youtube.com">
+            <img class="video-thumb" src="https://youtube.com">
             <p>Despacito</p>
-        </div>
-    </div>
-
-    <div id="player-overlay">
-        <iframe id="video-frame" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        </a>
     </div>
 
     <script>
         let currentIndex = 0;
         const totalVideos = 3;
-        let isPlaying = false;
 
-        function playVideo(videoId) {
-            isPlaying = true;
-            document.getElementById('video-frame').src = "https://youtube.com" + videoId + "?autoplay=1&controls=1&rel=0";
-            document.getElementById('player-overlay').style.display = 'block';
-        }
-
-        function closeVideo() {
-            isPlaying = false;
-            document.getElementById('player-overlay').style.display = 'none';
-            document.getElementById('video-frame').src = ""; 
-        }
-
+        // Gestion simplifiée pour la télécommande de la TV
         document.addEventListener('keydown', function(e) {
-            if (isPlaying) {
-                if (e.keyCode === 10009 || e.key === "Backspace" || e.keyCode === 27) { 
-                    closeVideo();
-                    e.preventDefault();
-                }
-                return;
-            }
-
             document.getElementById("video-" + currentIndex).classList.remove('focused');
 
-            if (e.keyCode === 37) {
+            if (e.keyCode === 37) { // Gauche
                 if (currentIndex > 0) currentIndex--;
-            } else if (e.keyCode === 39) {
+            } else if (e.keyCode === 39) { // Droite
                 if (currentIndex < totalVideos - 1) currentIndex++;
-            } else if (e.keyCode === 13) {
-                document.getElementById("video-" + currentIndex).click();
+            } else if (e.keyCode === 13) { // Touche OK de la télécommande ou Entrée du PC
+                // Force l'ouverture du lien HTML
+                window.location.href = document.getElementById("video-" + currentIndex).href;
             }
 
             document.getElementById("video-" + currentIndex).classList.add('focused');
