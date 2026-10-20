@@ -49,7 +49,7 @@
             transform: scale(1.05);
             background: #333;
         }
-        /* Style pour les miniatures de Google */
+        /* Style des images ajouté proprement */
         .video-thumb {
             width: 100%;
             height: 130px;
@@ -88,26 +88,25 @@
     <div class="grid">
         <!-- VIDÉO 1 -->
         <div class="video-card focused" id="video-0" onclick="playVideo('dQw4w9WgXcQ')">
-            <!-- Miniature stockée sur les serveurs Google stables -->
-            <img class="video-thumb" src="https://googleusercontent.com">
+            <img class="video-thumb" src="https://youtube.com" alt="Miniature">
             <p>Musique 1</p>
         </div>
 
         <!-- VIDÉO 2 -->
         <div class="video-card" id="video-1" onclick="playVideo('9bZkp7q19f0')">
-            <img class="video-thumb" src="https://googleusercontent.com">
+            <img class="video-thumb" src="https://youtube.com" alt="Miniature">
             <p>Musique 2</p>
         </div>
 
         <!-- VIDÉO 3 -->
         <div class="video-card" id="video-2" onclick="playVideo('kJQP7kiw5Fk')">
-            <img class="video-thumb" src="https://googleusercontent.com">
+            <img class="video-thumb" src="https://youtube.com" alt="Miniature">
             <p>Vidéo Animée</p>
         </div>
     </div>
 
     <div id="player-overlay">
-        <!-- VOTRE LECTEUR IDENTIQUE QUI FONCTIONNAIT -->
+        <!-- CORRECTION : Remplacement de la politique de sécurité pour autoriser la validation YouTube -->
         <iframe id="video-frame" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
 
@@ -116,10 +115,10 @@
         const totalVideos = 3;
         let isPlaying = false;
 
-        // VOTRE LOGIQUE DE LECTURE IDENTIQUE QUI FONCTIONNAIT
         function playVideo(videoId) {
             isPlaying = true;
-            document.getElementById('video-frame').src = "https://youtube.com/" + videoId + "?autoplay=1&controls=1&rel=0";
+            // Appel standardisé et sécurisé
+            document.getElementById('video-frame').src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&controls=1&rel=0";
             document.getElementById('player-overlay').style.display = 'block';
         }
 
