@@ -1,16 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whitelisted YouTube Player</title>
+    <title>Vidéos Approuvées</title>
     <style>
-        /* Base styles optimized for a 1080p/4K TV Screen */
         body {
             margin: 0;
             background-color: #141414;
             color: #ffffff;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: Arial, sans-serif;
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -22,51 +21,59 @@
         h1 {
             font-size: 2.5rem;
             margin-bottom: 2rem;
-            color: #e50914; /* Netflix-style red accent */
+            color: #e50914;
         }
 
-        /* Grid layout for videos */
-        .video-grid {
+        .grid {
             display: flex;
-            gap: 20px;
+            gap: 30px;
             justify-content: center;
             flex-wrap: wrap;
             max-width: 90%;
         }
 
-        /* Video thumbnail cards */
         .video-card {
             background: #222;
             border: 4px solid transparent;
-            border-radius: 8px;
-            padding: 10px;
+            border-radius: 15px;
             width: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             cursor: pointer;
             transition: transform 0.2s;
+            padding: 15px;
         }
 
-        /* Visual indicator for Tizen remote navigation focus */
-        .video-card.focused {
+        /* Sélection à la télécommande, clavier ou survol de souris */
+        .video-card.focused, .video-card:hover {
             border-color: #ffffff;
             transform: scale(1.05);
             background: #333;
         }
 
-        .video-card img {
+        /* Miniatures automatiques YouTube */
+        .video-thumb {
             width: 100%;
-            border-radius: 4px;
+            height: 150px;
+            border-radius: 8px;
+            object-fit: cover;
+            background-color: #000;
         }
 
         .video-card p {
-            margin-top: 10px;
+            margin-top: 15px;
             font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+            width: 100%;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        /* Fullscreen Player overlay */
         #player-overlay {
             position: fixed;
             top: 0;
@@ -87,49 +94,54 @@
 </head>
 <body>
 
-    <h1 id="app-title">Approved Videos Only</h1>
+    <h1>Vidéos Autorisées</h1>
     
-    <!-- Grid of allowed videos -->
-    <div class="video-grid" id="videoGrid"></div>
+    <div class="grid" id="videoGrid"></div>
 
-    <!-- Fullscreen Player Wrapper -->
     <div id="player-overlay">
         <div id="yt-player"></div>
     </div>
 
-    <!-- Load the YouTube Iframe API -->
-    <script src="https://youtu.be"></script>
+    <!-- Script de l'API YouTube obligatoire -->
+    <script src="https://youtube.com"></script>
     <script>
-        // 1. DEFINE YOUR WHITELIST HERE
-        // Replace these with your exact allowed YouTube Video IDs and Titles
-        const WHITELISTED_VIDEOS = [
+        // CONFIGURATION DES VIDÉOS ICI
+        // Mettez les titres que vous voulez et les vrais ID de vos vidéos YouTube
+        const APPROVED_VIDEOS = [
             { id: "2HNgd0n2h5Y", title: "Colors in English" },
             { id: "gifwrHhhOCE", title: "Car Colors" },
             { id: "-6H89G8Tn0E", title: "Lion and mouse" }
-
         ];
 
         let currentIndex = 0;
         let player = null;
         let isPlaying = false;
 
-        // 2. Build the UI grid dynamically
+        // Génération visuelle de la grille
         const grid = document.getElementById('videoGrid');
-        WHITELISTED_VIDEOS.forEach((video, index) => {
+        APPROVED_VIDEOS.forEach((video, index) => {
             const card = document.createElement('div');
             card.className = `video-card ${index === 0 ? 'focused' : ''}`;
             card.id = `video-${index}`;
+            
+            // Génère l'image de la miniature en haute qualité directement depuis YouTube
             card.innerHTML = `
-                <img src="https://youtube.com{video.id}/hqdefault.jpg" alt="thumbnail">
+                <img class="video-thumb" src="https://youtube.com{video.id}/hqdefault.jpg" alt="thumbnail">
                 <p>${video.title}</p>
             `;
+            
+            // Gestion du Clic Souris / Tactile (Pour PC et Portable)
+            card.addEventListener('click', function() {
+                playVideo(video.id);
+            });
+            
             grid.appendChild(card);
         });
 
-        // 3. Handle Tizen TV Remote Control inputs
+        // Gestion du Clavier (PC) et de la Télécommande (TV Samsung)
         document.addEventListener('keydown', function(e) {
             if (isPlaying) {
-                // If a video is playing, pressing Return/Back closes it
+                // Touche Retour TV (10009) ou Retour Arrière / Échap sur PC
                 if (e.keyCode === 10009 || e.key === "Backspace" || e.keyCode === 27) { 
                     closeVideo();
                     e.preventDefault();
@@ -137,59 +149,56 @@
                 return;
             }
 
-            const totalVideos = WHITELISTED_VIDEOS.length;
+            const total = APPROVED_VIDEOS.length;
             document.getElementById(`video-${currentIndex}`).classList.remove('focused');
 
             switch(e.keyCode) {
-                case 37: // Left Arrow
+                case 37: // Flèche Gauche
                     if (currentIndex > 0) currentIndex--;
                     break;
-                case 39: // Right Arrow
-                    if (currentIndex < totalVideos - 1) currentIndex++;
+                case 39: // Flèche Droite
+                    if (currentIndex < total - 1) currentIndex++;
                     break;
-                case 13: // Enter / Select Button
-                    playVideo(WHITELISTED_VIDEOS[currentIndex].id);
-                    break;
-                case 10009: // Tizen Return/Back Key (prevents app from closing instantly)
-                    console.log("Back pressed on main menu");
+                case 13: // Touche OK / Entrée
+                    playVideo(APPROVED_VIDEOS[currentIndex].id);
                     break;
             }
 
             document.getElementById(`video-${currentIndex}`).classList.add('focused');
         });
 
-        // 4. YouTube API Player Functions
-        function onYouTubeIframeAPIReady() {
-            // API loaded successfully, ready for instantiation
-        }
-
+        // Fonction pour lancer la vidéo sélectionnée
         function playVideo(videoId) {
             isPlaying = true;
             document.getElementById('player-overlay').style.display = 'block';
 
-            // Safely destroy previous player instance if it exists
-            if (player) {
-                player.destroy();
-            }
+            if (player) { player.destroy(); }
 
-            // Create a brand new locked-down player instance
+            // Création du lecteur vidéo sécurisé (bloqué sur cette vidéo)
             player = new YT.Player('yt-player', {
                 videoId: videoId,
                 playerVars: {
                     'autoplay': 1,
-                    'controls': 1,     // Shows pause/play timelines
-                    'rel': 0,          // Restricts related videos to the same channel (max protection possible)
-                    'modestbranding': 1, // Hides the YouTube logo link
-                    'disablekb': 1     // Disables external keyboard shortcuts
+                    'controls': 1,
+                    'rel': 0,            // Pas de suggestions d'autres chaînes à la fin
+                    'modestbranding': 1, // Masque le logo cliquable YouTube
+                    'mute': 1            // Mute requis pour forcer le lancement automatique sur PC/Mobile
                 },
                 events: {
+                    'onReady': onPlayerReady,
                     'onStateChange': onPlayerStateChange
                 }
             });
         }
 
+        function onPlayerReady(event) {
+            event.target.playVideo();
+            // Réactive le son automatiquement une demi-seconde après le lancement
+            setTimeout(() => { event.target.unMute(); }, 500);
+        }
+
         function onPlayerStateChange(event) {
-            // Automatically close the fullscreen overlay when the video ends
+            // Ferme automatiquement le mode plein écran quand la vidéo est finie
             if (event.data === YT.PlayerState.ENDED) {
                 closeVideo();
             }
@@ -198,10 +207,10 @@
         function closeVideo() {
             isPlaying = false;
             document.getElementById('player-overlay').style.display = 'none';
-            if (player) {
-                player.stopVideo();
-            }
+            if (player) { player.stopVideo(); }
         }
     </script>
 </body>
 </html>
+
+
