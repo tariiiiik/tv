@@ -47,14 +47,12 @@
             padding: 15px;
         }
 
-        /* Sélection à la télécommande, clavier ou survol de souris */
         .video-card.focused, .video-card:hover {
             border-color: #ffffff;
             transform: scale(1.05);
             background: #333;
         }
 
-        /* Miniatures automatiques YouTube */
         .video-thumb {
             width: 100%;
             height: 150px;
@@ -99,14 +97,11 @@
     <div class="grid" id="videoGrid"></div>
 
     <div id="player-overlay">
-        <div id="yt-player"></div>
+        <!-- Utilisation d'un iframe direct sans script externe pour éviter les blocages -->
+        <iframe id="video-frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
 
-    <!-- Script de l'API YouTube obligatoire -->
-    <script src="https://youtube.com"></script>
     <script>
-        // CONFIGURATION DES VIDÉOS ICI
-        // Mettez les titres que vous voulez et les vrais ID de vos vidéos YouTube
         const APPROVED_VIDEOS = [
             { id: "2HNgd0n2h5Y", title: "Colors in English" },
             { id: "gifwrHhhOCE", title: "Car Colors" },
@@ -114,23 +109,20 @@
         ];
 
         let currentIndex = 0;
-        let player = null;
         let isPlaying = false;
 
-        // Génération visuelle de la grille
         const grid = document.getElementById('videoGrid');
         APPROVED_VIDEOS.forEach((video, index) => {
             const card = document.createElement('div');
             card.className = `video-card ${index === 0 ? 'focused' : ''}`;
             card.id = `video-${index}`;
             
-            // Génère l'image de la miniature en haute qualité directement depuis YouTube
+            // hqdefault.jpg est parfois bloqué, on utilise hq720.jpg ou l'URL standard de secours
             card.innerHTML = `
-                <img class="video-thumb" src="https://youtube.com{video.id}/hqdefault.jpg" alt="thumbnail">
+                <img class="video-thumb" src="https://ytimg.com{video.id}/hqdefault.jpg" alt="thumbnail">
                 <p>${video.title}</p>
             `;
             
-            // Gestion du Clic Souris / Tactile (Pour PC et Portable)
             card.addEventListener('click', function() {
                 playVideo(video.id);
             });
@@ -138,10 +130,8 @@
             grid.appendChild(card);
         });
 
-        // Gestion du Clavier (PC) et de la Télécommande (TV Samsung)
         document.addEventListener('keydown', function(e) {
             if (isPlaying) {
-                // Touche Retour TV (10009) ou Retour Arrière / Échap sur PC
                 if (e.keyCode === 10009 || e.key === "Backspace" || e.keyCode === 27) { 
                     closeVideo();
                     e.preventDefault();
@@ -153,13 +143,13 @@
             document.getElementById(`video-${currentIndex}`).classList.remove('focused');
 
             switch(e.keyCode) {
-                case 37: // Flèche Gauche
+                case 37:
                     if (currentIndex > 0) currentIndex--;
                     break;
-                case 39: // Flèche Droite
+                case 39:
                     if (currentIndex < total - 1) currentIndex++;
                     break;
-                case 13: // Touche OK / Entrée
+                case 13:
                     playVideo(APPROVED_VIDEOS[currentIndex].id);
                     break;
             }
@@ -167,50 +157,22 @@
             document.getElementById(`video-${currentIndex}`).classList.add('focused');
         });
 
-        // Fonction pour lancer la vidéo sélectionnée
         function playVideo(videoId) {
             isPlaying = true;
-            document.getElementById('player-overlay').style.display = 'block';
-
-            if (player) { player.destroy(); }
-
-            // Création du lecteur vidéo sécurisé (bloqué sur cette vidéo)
-            player = new YT.Player('yt-player', {
-                videoId: videoId,
-                playerVars: {
-                    'autoplay': 1,
-                    'controls': 1,
-                    'rel': 0,            // Pas de suggestions d'autres chaînes à la fin
-                    'modestbranding': 1, // Masque le logo cliquable YouTube
-                    'mute': 1            // Mute requis pour forcer le lancement automatique sur PC/Mobile
-                },
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange
-                }
-            });
-        }
-
-        function onPlayerReady(event) {
-            event.target.playVideo();
-            // Réactive le son automatiquement une demi-seconde après le lancement
-            setTimeout(() => { event.target.unMute(); }, 500);
-        }
-
-        function onPlayerStateChange(event) {
-            // Ferme automatiquement le mode plein écran quand la vidéo est finie
-            if (event.data === YT.PlayerState.ENDED) {
-                closeVideo();
-            }
+            const overlay = document.getElementById('player-overlay');
+            const frame = document.getElementById('video-frame');
+            
+            // youtube-nocookie.com est la version officielle de YouTube pour contourner les protections contre le pistage
+            frame.src = `https://youtube-nocookie.com{videoId}?autoplay=1&controls=1&rel=0&modestbranding=1`;
+            overlay.style.display = 'block';
         }
 
         function closeVideo() {
             isPlaying = false;
             document.getElementById('player-overlay').style.display = 'none';
-            if (player) { player.stopVideo(); }
+            document.getElementById('video-frame').src = ""; // Coupe le son et la vidéo
         }
     </script>
 </body>
 </html>
-
 
