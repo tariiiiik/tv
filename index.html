@@ -49,22 +49,20 @@
             transform: scale(1.05);
             background: #333;
         }
+        /* Style pour les miniatures de Google */
         .video-thumb {
             width: 100%;
             height: 130px;
             border-radius: 10px;
             object-fit: cover;
             margin-bottom: 10px;
+            background-color: #000;
         }
         .video-card p {
-            margin: 5px 0 0 0;
-            font-size: 1.2rem;
+            margin: 10px 0 0 0;
+            font-size: 1.3rem;
             font-weight: bold;
             color: #fff;
-            width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
         #player-overlay {
             position: fixed;
@@ -90,25 +88,26 @@
     <div class="grid">
         <!-- VIDÉO 1 -->
         <div class="video-card focused" id="video-0" onclick="playVideo('dQw4w9WgXcQ')">
-            <!-- Image autonome intégrée en texte (ne fait aucun appel internet) -->
-            <img class="video-thumb" src="data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='200' height='130' viewBox='0 0 200 130'><rect width='100%' height='100%' fill='%23ff5722'/><circle cx='100' cy='65' r='30' fill='white' opacity='0.3'/><polygon points='90,50 120,65 90,80' fill='white'/></svg>">
-            <p>Rick Astley</p>
+            <!-- Miniature stockée sur les serveurs Google stables -->
+            <img class="video-thumb" src="https://googleusercontent.com">
+            <p>Musique 1</p>
         </div>
 
         <!-- VIDÉO 2 -->
         <div class="video-card" id="video-1" onclick="playVideo('9bZkp7q19f0')">
-            <img class="video-thumb" src="data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='200' height='130' viewBox='0 0 200 130'><rect width='100%' height='100%' fill='%2300abc9'/><circle cx='100' cy='65' r='30' fill='white' opacity='0.3'/><polygon points='90,50 120,65 90,80' fill='white'/></svg>">
-            <p>Gangnam Style</p>
+            <img class="video-thumb" src="https://googleusercontent.com">
+            <p>Musique 2</p>
         </div>
 
         <!-- VIDÉO 3 -->
         <div class="video-card" id="video-2" onclick="playVideo('kJQP7kiw5Fk')">
-            <img class="video-thumb" src="data:image/svg+xml;utf8,<svg xmlns='http://w3.org' width='200' height='130' viewBox='0 0 200 130'><rect width='100%' height='100%' fill='%234caf50'/><circle cx='100' cy='65' r='30' fill='white' opacity='0.3'/><polygon points='90,50 120,65 90,80' fill='white'/></svg>">
-            <p>Despacito</p>
+            <img class="video-thumb" src="https://googleusercontent.com">
+            <p>Vidéo Animée</p>
         </div>
     </div>
 
     <div id="player-overlay">
+        <!-- VOTRE LECTEUR IDENTIQUE QUI FONCTIONNAIT -->
         <iframe id="video-frame" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
 
@@ -117,6 +116,7 @@
         const totalVideos = 3;
         let isPlaying = false;
 
+        // VOTRE LOGIQUE DE LECTURE IDENTIQUE QUI FONCTIONNAIT
         function playVideo(videoId) {
             isPlaying = true;
             document.getElementById('video-frame').src = "https://youtube.com" + videoId + "?autoplay=1&controls=1&rel=0";
