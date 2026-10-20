@@ -49,7 +49,6 @@
             transform: scale(1.05);
             background: #333;
         }
-        /* Icônes géantes en remplacement des miniatures externes */
         .video-icon {
             font-size: 4.5rem;
             margin-bottom: 10px;
@@ -102,8 +101,8 @@
     </div>
 
     <div id="player-overlay">
-        <!-- L'attribut 'referrerpolicy' est ajouté pour forcer l'acceptation sur TV et PC -->
-        <iframe id="video-frame" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="no-referrer"></iframe>
+        <!-- CORRECTION : Remplacement de la politique de sécurité pour autoriser la validation YouTube -->
+        <iframe id="video-frame" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
 
     <script>
@@ -113,8 +112,8 @@
 
         function playVideo(videoId) {
             isPlaying = true;
-            // Retour au domaine racine youtube.com mondial, impossible à bloquer de manière sélective
-            document.getElementById('video-frame').src = "https://youtube.com" + videoId + "?autoplay=1&controls=1&rel=0";
+            // Appel standardisé et sécurisé
+            document.getElementById('video-frame').src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&controls=1&rel=0";
             document.getElementById('player-overlay').style.display = 'block';
         }
 
@@ -124,7 +123,6 @@
             document.getElementById('video-frame').src = ""; 
         }
 
-        // Configuration pour clavier PC et télécommande TV
         document.addEventListener('keydown', function(e) {
             if (isPlaying) {
                 if (e.keyCode === 10009 || e.key === "Backspace" || e.keyCode === 27) { 
@@ -136,11 +134,11 @@
 
             document.getElementById("video-" + currentIndex).classList.remove('focused');
 
-            if (e.keyCode === 37) { // Flèche Gauche
+            if (e.keyCode === 37) {
                 if (currentIndex > 0) currentIndex--;
-            } else if (e.keyCode === 39) { // Flèche Droite
+            } else if (e.keyCode === 39) {
                 if (currentIndex < totalVideos - 1) currentIndex++;
-            } else if (e.keyCode === 13) { // Touche OK
+            } else if (e.keyCode === 13) {
                 document.getElementById("video-" + currentIndex).click();
             }
 
