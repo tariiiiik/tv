@@ -17,13 +17,11 @@
             justify-content: center;
             height: 100vh;
         }
-
         h1 {
             font-size: 2.5rem;
             margin-bottom: 2rem;
             color: #e50914;
         }
-
         .grid {
             display: flex;
             gap: 30px;
@@ -31,47 +29,33 @@
             flex-wrap: wrap;
             max-width: 90%;
         }
-
         .video-card {
             background: #222;
             border: 4px solid transparent;
             border-radius: 15px;
             width: 280px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             text-align: center;
             cursor: pointer;
             transition: transform 0.2s;
             padding: 15px;
         }
-
-        .video-card.focused, .video-card:hover {
+        .video-card:hover, .video-card.focused {
             border-color: #ffffff;
             transform: scale(1.05);
             background: #333;
         }
-
         .video-thumb {
             width: 100%;
             height: 150px;
             border-radius: 8px;
             object-fit: cover;
-            background-color: #000;
         }
-
         .video-card p {
             margin-top: 15px;
             font-size: 1.1rem;
             font-weight: bold;
             color: #fff;
-            width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
-
         #player-overlay {
             position: fixed;
             top: 0;
@@ -82,7 +66,6 @@
             display: none;
             z-index: 9999;
         }
-
         iframe {
             width: 100%;
             height: 100%;
@@ -94,39 +77,48 @@
 
     <h1>Vidéos Autorisées</h1>
     
-    <div class="grid" id="videoGrid"></div>
+    <div class="grid">
+        <!-- VIDÉO 1 -->
+        <div class="video-card focused" id="video-0" onclick="playVideo('dQw4w9WgXcQ')">
+            <img class="video-thumb" src="https://youtube.com">
+            <p>Rick Astley</p>
+        </div>
+
+        <!-- VIDÉO 2 -->
+        <div class="video-card" id="video-1" onclick="playVideo('9bZkp7q19f0')">
+            <img class="video-thumb" src="https://youtube.com">
+            <p>Gangnam Style</p>
+        </div>
+
+        <!-- VIDÉO 3 -->
+        <div class="video-card" id="video-2" onclick="playVideo('kJQP7kiw5Fk')">
+            <img class="video-thumb" src="https://youtube.com">
+            <p>Despacito</p>
+        </div>
+    </div>
 
     <div id="player-overlay">
         <iframe id="video-frame" allow="autoplay; encrypted-media" allowfullscreen></iframe>
     </div>
 
     <script>
-        // CONFIGURATION DES VIDÉOS
-        const APPROVED_VIDEOS = [
-            { title: "Rick Astley", id: "dQw4w9WgXcQ" },
-            { title: "Gangnam Style", id: "9bZkp7q19f0" },
-            { title: "Despacito", id: "kJQP7kiw5Fk" }
-        ];
-
         let currentIndex = 0;
+        const totalVideos = 3;
         let isPlaying = false;
 
-        const grid = document.getElementById('videoGrid');
-        APPROVED_VIDEOS.forEach((video, index) => {
-            const card = document.createElement('div');
-            card.className = "video-card" + (index === 0 ? " focused" : "");
-            card.id = "video-" + index;
-            
-            // Code nettoyé de toute barre inversée
-            card.innerHTML = '<img class="video-thumb" src="https://youtube.com' + video.id + '/hqdefault.jpg" alt="thumbnail"><p>' + video.title + '</p>';
-            
-            card.addEventListener('click', function() {
-                playVideo(video.id);
-            });
-            
-            grid.appendChild(card);
-        });
+        function playVideo(videoId) {
+            isPlaying = true;
+            document.getElementById('video-frame').src = "https://youtube-nocookie.com" + videoId + "?autoplay=1&controls=1&rel=0&modestbranding=1";
+            document.getElementById('player-overlay').style.display = 'block';
+        }
 
+        function closeVideo() {
+            isPlaying = false;
+            document.getElementById('player-overlay').style.display = 'none';
+            document.getElementById('video-frame').src = ""; 
+        }
+
+        // Gestion de la télécommande et du clavier
         document.addEventListener('keydown', function(e) {
             if (isPlaying) {
                 if (e.keyCode === 10009 || e.key === "Backspace" || e.keyCode === 27) { 
@@ -136,39 +128,18 @@
                 return;
             }
 
-            const total = APPROVED_VIDEOS.length;
             document.getElementById("video-" + currentIndex).classList.remove('focused');
 
-            switch(e.keyCode) {
-                case 37:
-                    if (currentIndex > 0) currentIndex--;
-                    break;
-                case 39:
-                    if (currentIndex < total - 1) currentIndex++;
-                    break;
-                case 13:
-                    playVideo(APPROVED_VIDEOS[currentIndex].id);
-                    break;
+            if (e.keyCode === 37) { // Gauche
+                if (currentIndex > 0) currentIndex--;
+            } else if (e.keyCode === 39) { // Droite
+                if (currentIndex < totalVideos - 1) currentIndex++;
+            } else if (e.keyCode === 13) { // Entrée / OK
+                document.getElementById("video-" + currentIndex).click();
             }
 
             document.getElementById("video-" + currentIndex).classList.add('focused');
         });
-
-        function playVideo(videoId) {
-            isPlaying = true;
-            const overlay = document.getElementById('player-overlay');
-            const frame = document.getElementById('video-frame');
-            
-            // Lien d'intégration officiel corrigé
-            frame.src = "https://youtube-nocookie.com" + videoId + "?autoplay=1&controls=1&rel=0&modestbranding=1";
-            overlay.style.display = 'block';
-        }
-
-        function closeVideo() {
-            isPlaying = false;
-            document.getElementById('player-overlay').style.display = 'none';
-            document.getElementById('video-frame').src = ""; 
-        }
     </script>
 </body>
 </html>
