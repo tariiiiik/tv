@@ -49,24 +49,23 @@
             transform: scale(1.05);
             background: #333;
         }
-        .video-blank-thumb {
+        /* Design local épuré : aucun chargement d'image sur internet */
+        .video-icon-box {
             width: 100%;
             height: 130px;
             border-radius: 10px;
-            background: linear-gradient(135deg, #2b2b2b, #1a1a1a);
-            border: 1px solid #444;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3rem;
+            font-size: 3.5rem;
             color: #e50914;
-            text-shadow: 0 0 10px rgba(229, 9, 20, 0.6);
         }
-        .video-card.focused .video-blank-thumb {
-            background: linear-gradient(135deg, #3a3a3a, #222);
-            color: #ff1e27;
-            text-shadow: 0 0 15px rgba(255, 30, 39, 0.9);
+        .video-card.focused .video-icon-box {
+            background-color: #262626;
+            color: #ff222c;
         }
         .video-card p {
             margin: 10px 0 0 0;
@@ -98,25 +97,25 @@
     <div class="grid">
         <!-- VIDÉO 1 -->
         <div class="video-card focused" id="video-0" onclick="playVideo('dQw4w9WgXcQ')">
-            <div class="video-blank-thumb">▶</div>
+            <div class="video-icon-box">▶</div>
             <p>Musique 1</p>
         </div>
 
         <!-- VIDÉO 2 -->
         <div class="video-card" id="video-1" onclick="playVideo('9bZkp7q19f0')">
-            <div class="video-blank-thumb">▶</div>
+            <div class="video-icon-box">▶</div>
             <p>Musique 2</p>
         </div>
 
         <!-- VIDÉO 3 -->
         <div class="video-card" id="video-2" onclick="playVideo('kJQP7kiw5Fk')">
-            <div class="video-blank-thumb">▶</div>
+            <div class="video-icon-box">▶</div>
             <p>Vidéo Animée</p>
         </div>
     </div>
 
     <div id="player-overlay">
-        <!-- Retour à la configuration d'origine stable -->
+        <!-- VOTRE CODE IFRAME INITIAL STRICTEMENT IDENTIQUE -->
         <iframe id="video-frame" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
 
@@ -125,10 +124,10 @@
         const totalVideos = 3;
         let isPlaying = false;
 
+        // VOTRE LOGIQUE DE LECTURE INITIALE STRICTEMENT IDENTIQUE
         function playVideo(videoId) {
             isPlaying = true;
-            // Retour au domaine principal fonctionnel avec filtres anti-pub combinés
-            document.getElementById('video-frame').src = "https://youtube.com" + videoId + "?autoplay=1&controls=1&rel=0&modestbranding=1&iv_load_policy=3&vq=hd1080";
+            document.getElementById('video-frame').src = "https://youtube.com" + videoId + "?autoplay=1&controls=1&rel=0";
             document.getElementById('player-overlay').style.display = 'block';
         }
 
