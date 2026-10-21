@@ -1,212 +1,369 @@
-<!DOCTYPE html>
+<!DOCTYPE html - version tésté le 20/10/26>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Espace Vidéo Sécurisé</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            padding: 20px;
-        }
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 20px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        header h1 {
-            color: #00bcd4;
-            margin-bottom: 10px;
-        }
-        .theme-nav {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        .theme-nav a {
-            text-decoration: none;
+            margin: 0;
+            background-color: #141414;
             color: #ffffff;
-            background-color: #00bcd4;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            transition: background 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .theme-nav a:hover {
-            background-color: #008ba3;
-        }
-        .theme-section {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            scroll-margin-top: 20px;
-        }
-        .theme-section h2 {
-            font-size: 1.5rem;
-            color: #2c3e50;
-            border-bottom: 3px solid #00bcd4;
-            padding-bottom: 10px;
-            margin-bottom: 25px;
-        }
-        .video-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-        }
-        .video-card {
-            background: #fafafa;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh; 
+            padding: 20px 0; /* Ajoute un espace de sécurité en haut et en bas sur mobile */
+            box-sizing: border-box;
         }
-        .video-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #e50914;
         }
+        .grid {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 90%;
+        }
+        .video-card {
+            background: #222;
+            border: 4px solid transparent;
+            border-radius: 20px;
+            width: 250px;
+            /* Changement : hauteur automatique pour s'adapter proprement au contenu */
+            height: auto; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            padding: 15px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .video-card:hover, .video-card.focused {
+            border-color: #ffffff;
+            transform: scale(1.05);
+            background: #333;
+        }
+        
+        /* AJOUT : Styles pour redimensionner proprement les miniatures */
         .video-thumb {
             width: 100%;
-            height: auto;
-            aspect-ratio: 16 / 9;
-            object-fit: cover;
-            border-bottom: 1px solid #e0e0e0;
+            aspect-ratio: 16 / 9; /* Force le format standard d'une miniature */
+            object-fit: cover;    /* Rempli l'espace sans écraser ni étirer l'image */
+            object-position: center;
+            border-radius: 12px;  /* Optionnel : adoucit les angles de la miniature */
         }
+
         .video-card p {
-            padding: 12px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: #34495e;
-            line-height: 1.4;
-            text-align: center;
-            flex-grow: 1;
+            margin: 15px 0 5px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+            width: 100%;
+            /* Optionnel : empêche le texte de casser la mise en page s'il est trop long */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .theme-section[lang="ar"] p {
-            direction: rtl;
-        }
-        .theme-section[lang="ar"] h2 {
-            text-align: right;
-            border-bottom: 3px solid #ff9800;
-        }
-        .theme-nav a.ar-nav {
-            background-color: #ff9800;
-        }
-        .theme-nav a.ar-nav:hover {
-            background-color: #e65100;
-        }
-        #video-player-container {
-            display: none;
+        #player-overlay {
             position: fixed;
             top: 0;
             left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            display: none;
+            z-index: 9999;
+        }
+        iframe {
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .player-box {
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            max-width: 600px;
-            width: 90%;
-        }
-        .close-btn {
-            margin-top: 15px;
-            padding: 8px 16px;
-            background: #e74c3c;
-            color: white;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>Espace Vidéo Sécurisé</h1>
-        <p>Filtrer les vidéos par catégories thématiques à l'aide des boutons ci-dessous.</p>
-    </header>
-
-    <nav class="theme-nav">
-        <a href="#apprentissage-section">Comptines & Apprentissage</a>
-        <a href="#smurfs-section">Les Schtroumpfs (السنافر)</a>
-        <a href="#alawady-section" class="ar-nav">قصص الأنبياء (نبيل العوضي)</a>
-    </nav>
-
-    <!-- SECTION 1 : COMPTINES & APPRENTISSAGE -->
-    <section id="apprentissage-section" class="theme-section">
-        <h2>Comptines et Apprentissage (Titounis)</h2>
-        <div class="video-grid">
-            <div class="video-card" id="vid-learn-1" onclick="playVideo('6rSYst-n05M')">
-                <img class="video-thumb" src="https://ytimg.com" alt="Miniature Titounis">
-                <p>Comptines pour apprendre - Titounis</p>
-            </div>
+    <h1>Nouvelles Vidéos!</h1>
+    
+    <div class="grid">
+        
+        <!-- VIDÉO 1 -->
+        <div class="video-card focused" id="video-0" onclick="playVideo('IbOmFVJVVSY')">
+            <!-- Lien d'image hébergé publiquement (Ne sera pas bloqué par le navigateur) -->
+            <img class="video-thumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR270VT0tQr3T_XGITYKoUkEUGYvuLU9F6oZG8sQZEnHA&s=10" alt="Miniature 1">
+            <p>Comptines pour apprendre - Titounis</p>
         </div>
-    </section>
 
-    <!-- SECTION 2 : LES SCHTROUMPFS -->
-    <section id="smurfs-section" class="theme-section">
-        <h2>Les Schtroumpfs • السنافر</h2>
-        <div class="video-grid">
-            <div class="video-card" id="smurfs-1" onclick="playVideo('C_WPpBX5MNQ')">
-                <img class="video-thumb" src="https://ytimg.com" alt="Miniature Smurfs">
-                <p>السنفور الأرجواني! • حلقات ريمستر</p>
-            </div>
+        <!-- VIDÉO 2 -->
+        <div class="video-card" id="video-1" onclick="playVideo('J_O424Z8vQs')">
+            <img class="video-thumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVtGCikYrpSK37LBqfuJASh5e-Od6IASm4umsCsuPzUw&s=10" alt="Miniature 2">
+            <p>Apprendre Les couleurs - Les Titounis</p>
         </div>
-    </section>
 
-    <!-- SECTION 3 : QISSAS AL ANBIYA -->
-    <section id="alawady-section" class="theme-section" lang="ar">
-        <h2>قصص الأنبياء للشيخ نبيل العوضي</h2>
-        <div class="video-grid">
-            <div class="video-card" id="alawady-1" onclick="playVideo('pB7uZzu2dLI')">
-                <img class="video-thumb" src="https://ytimg.com" alt="نبيل العوضي">
-                <p>قصة بداية الخلق وسيدنا آدم عليه السلام - الجزء الأول</p>
-            </div>
+        <!-- VIDÉO 3 -->
+        <div class="video-card" id="video-2" onclick="playVideo('KOYONV1GjrI')">
+            <img class="video-thumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRlCo8l3tnRqeXM6dtvvYy7MEUA35-z37bzJWIpBdwGgw&s=10" alt="Miniature 3">
+            <p>Apprendre les fruits en français</p>
         </div>
-    </section>
 
-    <!-- LECTEUR POPUP -->
-    <div id="video-player-container">
-        <div class="player-box">
-            <h3>Lecture de la vidéo</h3>
-            <p id="playing-id" style="color: #555; margin: 10px 0; font-family: monospace;"></p>
-            <p>Ici s'exécute votre logique iframe ou player YouTube.</p>
-            <button class="close-btn" onclick="closeVideo()">Fermer</button>
+        <!-- VIDÉO 4 -->
+        <div class="video-card" id="video-2" onclick="playVideo('6rSYst-n05M')">
+            <img class="video-thumb" src="https://i.ytimg.com/vi/6rSYst-n05M/maxresdefault.jpg" alt="Miniature 4">
+            <p>Apprendre les animaux et leurs cris</p>
         </div>
+
+        <!-- VIDÉO 5 -->
+        <div class="video-card" id="video-2" onclick="playVideo('zqPs8uKpsRQ')">
+            <img class="video-thumb" src="https://i.ytimg.com/vi/zqPs8uKpsRQ/maxresdefault.jpg" alt="Miniature 5">
+            <p>Apprendre a compter</p>
+        </div>
+
+        <!-- VIDÉO 6 -->
+        <div class="video-card" id="video-2" onclick="playVideo('nP8Amij9VaQ')">
+            <img class="video-thumb" src="https://i.ytimg.com/vi/nP8Amij9VaQ/sddefault.jpg" alt="Miniature 6">
+            <p>Apprendre les formes</p>
+        </div>
+
+        <!-- VIDÉO 7 -->
+        <div class="video-card" id="video-2" onclick="playVideo('2LG1nqWeKJ4')">
+            <img class="video-thumb" src="https://i.ytimg.com/vi/2LG1nqWeKJ4/maxresdefault.jpg" alt="Miniature 7">
+            <p>Atfal wa Mawahib</p>
+        </div>
+
+        <!-- VIDÉO 8 -->
+        <div class="video-card" id="video-2" onclick="playVideo('https://www.tiktok.com/@muftimenkofficial/video/7697706279942245640')">
+            <img class="video-thumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfP4riAAXzQT0ejGOhP_AIJmmA50iQxzG0eoV02_kaCYiQhG3XWVoIHx6h&s=10" alt="Miniature 8">
+            <p>The world is building flying cars</p>
+        </div>
+
+        <!-- VIDÉO 9 -->
+        <div class="video-card" id="video-2" onclick="playVideo('myd0c6McEno')">
+            <img class="video-thumb" src="https://i.ytimg.com/vi/myd0c6McEno/oar2.jpg?sqp=-oaymwEYCJUDENAFSFqQAgHyq4qpAwcIARUAAIhC&rs=AOn4CLDwAyGLOWAsVPdh5_erQzH2uPTn4g" alt="Miniature 9">
+            <p>Cars fly!</p>
+        </div>
+
+         <!-- VIDÉO 10 -->
+        <div class="video-card" id="video-2" onclick="playVideo('SnSJkEktrso')">
+            <img class="video-thumb" src="https://i.ytimg.com/vi/SnSJkEktrso/hq720.jpg?sqp=-oaymwEYCJUDENAFSFryq4qpAwoIARUAAIhC0AEB&rs=AOn4CLB_LsMlfURs2GX2bdHjS7Lw6tUyFg" alt="Miniature 10">
+            <p>Real Friends!</p>
+        </div>
+
+         <!-- VIDÉO X -->
+        <div class="video-card" id="video-2" onclick="playVideo('f5K9cUqalmA')">
+            <img class="video-thumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8NAEcfuclqi0CxEmv0pRHsrKBecxN-C7ZU5_bXtPBeuVWfr-LjQpMh6Pl&s=10" alt="Miniature X">
+            <p>“Five more minutes…”</p>
+        </div>
+
+    
+        <!-- ========================================== -->
+    <!--  CHAÎNE 1 : عمر وهنا (Omar & Hana Arabic)  -->
+    <!-- ========================================== -->
+    
+    <!-- VIDÉO 10 -->
+    <div class="video-card" id="video-10" onclick="playVideo('fLj9dxlu-oY')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/fLj9dxlu-oY/maxresdefault.jpg" alt="Animation Islamique">
+        <p>عمر وهنا - الكاراتيه للأطفال بداية الطريق ممتع لتعليم الصغار</p>
+    </div>
+
+    <!-- VIDÉO 11 -->
+    <div class="video-card" id="video-11" onclick="playVideo('rgvqiGMQe0k')">
+        <img class="video-thumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMH2rhr3sRerfqY2Gp7ntd3N72KNDpkV5K6Z0rA1GL5Q&s=10" alt="Dessin Animé Frères">
+        <p>عمر وهنا - مجموعة حلقات و أناشيد عمر و هنا العربية كاملة</p>
+    </div>
+
+    <!-- VIDÉO 12 -->
+    <div class="video-card" id="video-12" onclick="playVideo('o6p_ogEz8mM')">
+        <img class="video-thumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmhrbnFVTNco0lmM90TqMCZ4PPOZeFN_LXhphMYlnsvQ&s=10" alt="Famille Musulmane">
+        <p>عمر وهنا - أنشودة التربية الدينية الإسلامية للأطفال الصغار</p>
+    </div>
+
+    <!-- VIDÉO 13 -->
+    <div class="video-card" id="video-13" onclick="playVideo('HEYhc5voZxY')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/HEYhc5voZxY/maxresdefault.jpg" alt="Enfants Joyeux">
+        <p>عمر وهنا - وقت النزهة</p>
+    </div>
+
+    <!-- VIDÉO 14 -->
+    <div class="video-card" id="video-14" onclick="playVideo('HIFc-VjzHbI')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/HIFc-VjzHbI/maxresdefault.jpg" alt="Couleurs Lumineuses">
+        <p>عمر وهنا - أنشودة الحمد لله والشكر لله رسوم متحركة</p>
+    </div>
+
+    <!-- VIDÉO 15 -->
+    <div class="video-card" id="video-15" onclick="playVideo('hs-1o10P4ck')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/hs-1o10P4ck/maxresdefault.jpg" alt="Nature Dessin">
+        <p>عمر وهنا - أنشودة بسم الله توكلنا على الله للأطفال</p>
+    </div>
+
+    <!-- VIDÉO 16 -->
+    <div class="video-card" id="video-16" onclick="playVideo('5-clsCqFAns')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/5-clsCqFAns/maxresdefault.jpg" alt="Prière Enfants">
+        <p>عمر وهنا - Wash your hands</p>
+    </div>
+
+    <!-- VIDÉO 17 -->
+    <div class="video-card" id="video-17" onclick="playVideo('jQUpnVksmys')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/jQUpnVksmys/maxresdefault.jpg" alt="Repas Partagé">
+        <p>عمر وهنا - آداب الطعام والشراب للأطفال الصغار</p>
+    </div>
+
+    <!-- VIDÉO 18 -->
+    <div class="video-card" id="video-18" onclick="playVideo('lLrMWZYdKFc')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/lLrMWZYdKFc/maxresdefault.jpg" alt="Salutations">
+        <p>عمر وهنا - أنشودة السلام عليكم وإفشاء السلام كرتون</p>
+    </div>
+
+    <!-- VIDÉO 19 -->
+    <div class="video-card" id="video-19" onclick="playVideo('lhtD-vrs7Zs')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/lhtD-vrs7Zs/maxresdefault.jpg" alt="Entraide Amis">
+        <p>عمر وهنا - قصة مساعدة الآخرين والتعاون والعمل الصالح</p>
+    </div>
+
+    <!-- VIDÉO 20 -->
+    <div class="video-card" id="video-20" onclick="playVideo('3N0dmHVTc48')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/3N0dmHVTc48/maxresdefault.jpg" alt="Alphabet Arabe">
+        <p>عمر وهنا - أنشودة الحروف العربية الهجائية الرائعة للأطفال</p>
+    </div>
+
+    <!-- VIDÉO 21 -->
+    <div class="video-card" id="video-21" onclick="playVideo('l4UTlqRz_kM')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/l4UTlqRz_kM/maxresdefault.jpg" alt="Éducation Valeurs">
+        <p>عمر وهنا - حلقة خاصة عن الصدقة</p>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!--  CHAÎNE 2 : تعلم مع زكريا (Learn with Zakaria) -->
+    <!-- ========================================== -->
+    
+    <!-- VIDÉO 22 -->
+    <div class="video-card" id="video-22" onclick="playVideo('uQduiqkCKz0')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/uQduiqkCKz0/maxresdefault.jpg" alt="Apprentissage Écran">
+        <p>تعلم مع زكريا - فيديو تعليمي وتثقيفي ممتع ومضحك للأطفال</p>
+    </div>
+
+    <!-- VIDÉO 23 -->
+    <div class="video-card" id="video-23" onclick="playVideo('EZI-l6p_B5E')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/jYoSkcOiqf4/maxresdefault.jpg" alt="Chiffres Couleurs">
+        <p>تعلم مع زكريا - برنامج الحروف والأرقام الفريد للآباء والمعلمين</p>
+    </div>
+
+    <!-- VIDÉO 24 -->
+    <div class="video-card" id="video-24" onclick="playVideo('xHn-zrQ_rA8')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/xHn-zrQ_rA8/maxresdefault.jpg" alt="Sports Icônes">
+        <p>تعلم مع زكريا - لعبة بطاقات الذاكرة (الحلقة 7) الرياضات للأطفال</p>
+    </div>
+
+    <!-- VIDÉO 25 -->
+    <div class="video-card" id="video-25" onclick="playVideo('itFDZmIZ6pg')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/itFDZmIZ6pg/maxresdefault.jpg" alt="Animaux Jungle">
+        <p>تعلم مع زكريا - تعليم الحروف العربية والأسماء مع زيكو والحيوانات</p>
+    </div>
+
+    <!-- VIDÉO 26 -->
+    <div class="video-card" id="video-26" onclick="playVideo('X5e26QxffEA')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/X5e26QxffEA/maxresdefault.jpg" alt="Formes Géométriques">
+        <p>تعلم مع زكريا - تعليم الألوان والأشكال الهندسية الأساسية باللغة العربية</p>
+    </div>
+
+    <!-- VIDÉO 27 -->
+    <div class="video-card" id="video-27" onclick="playVideo('0xYTcZvVCuI')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/0xYTcZvVCuI/maxresdefault.jpg" alt="Fonds Étoiles">
+        <p>تعلم مع زكريا - أسماء الحيوانات وأصواتها بطريقة تفاعلية مميزة</p>
+    </div>
+
+    <!-- VIDÉO 28 -->
+    <div class="video-card" id="video-28" onclick="playVideo('uCYv55twbhE')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/yHYI7apORwY/maxresdefault.jpg" alt="Abstrait Coloré">
+        <p>تعلم مع زكريا - أنشودة الأرقام من 1 إلى 10 لتعليم العد السريع</p>
+    </div>
+
+    <!-- VIDÉO 29 -->
+    <div class="video-card" id="video-29" onclick="playVideo('Xw0nyGO3EKQ')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/Xw0nyGO3EKQ/maxresdefault.jpg">
+        <p>تعلم مع زكريا - أسماء الفواكه والخضروات وفوائدها الصحية للأطفال</p>
+    </div>
+
+    <!-- VIDÉO 30 -->
+    <div class="video-card" id="video-30" onclick="playVideo('NZkzlr6Xkkk')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/NZkzlr6Xkkk/maxresdefault.jpg" alt="Calendrier Saisons">
+        <p>تعلم مع زكريا - أيام الأسبوع وفصول السنة كرتون تعليمي مشوق</p>
+    </div>
+
+    <!-- VIDÉO 31 -->
+    <div class="video-card" id="video-31" onclick="playVideo('EhiGR-lb17o')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/EhiGR-lb17o/maxresdefault.jpg" alt="Transports Camion">
+        <p>تعلم مع زكريا - وسائل النقل والمواصلات المختلفة برسوم كرتونية</p>
+    </div>
+
+    <!-- VIDÉO 32 -->
+    <div class="video-card" id="video-32" onclick="playVideo('KTRDQKTeXHk')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/o8bO5EFVfQs/sddefault.jpg" alt="Corps Humain">
+        <p>تعلم مع زكريا - أعضاء الجسم البشري ووظائفها للأطفال والناشئين</p>
+    </div>
+
+    <!-- VIDÉO 33 -->
+    <div class="video-card" id="video-33" onclick="playVideo('ibL5Q7Ovfhc')">
+        <img class="video-thumb" src="https://i.ytimg.com/vi/ibL5Q7Ovfhc/maxresdefault.jpg" alt="Métiers Équipes">
+        <p>تعلم مع زكريا - المهن والوظائف المختلفة للمجتمع بأسلوب رائع</p>
+    </div>
+
+    <div id="player-overlay">
+        <!-- CORRECTION : Remplacement de la politique de sécurité pour autoriser la validation YouTube -->
+        <iframe id="video-frame" allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
     </div>
 
     <script>
+        let currentIndex = 0;
+        const totalVideos = 3;
+        let isPlaying = false;
+
         function playVideo(videoId) {
-            console.log("Lecture demandée pour la vidéo ID : " + videoId);
-            document.getElementById('playing-id').innerText = "ID de la vidéo chargée : " + videoId;
-            document.getElementById('video-player-container').style.display = 'flex';
+            isPlaying = true;
+            // Appel standardisé et sécurisé
+            document.getElementById('video-frame').src = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&controls=1&rel=0";
+            document.getElementById('player-overlay').style.display = 'block';
         }
+
         function closeVideo() {
-            document.getElementById('video-player-container').style.display = 'none';
+            isPlaying = false;
+            document.getElementById('player-overlay').style.display = 'none';
+            document.getElementById('video-frame').src = ""; 
         }
+
+        document.addEventListener('keydown', function(e) {
+            if (isPlaying) {
+                if (e.keyCode === 10009 || e.key === "Backspace" || e.keyCode === 27) { 
+                    closeVideo();
+                    e.preventDefault();
+                }
+                return;
+            }
+
+            document.getElementById("video-" + currentIndex).classList.remove('focused');
+
+            if (e.keyCode === 37) {
+                if (currentIndex > 0) currentIndex--;
+            } else if (e.keyCode === 39) {
+                if (currentIndex < totalVideos - 1) currentIndex++;
+            } else if (e.keyCode === 13) {
+                document.getElementById("video-" + currentIndex).click();
+            }
+
+            document.getElementById("video-" + currentIndex).classList.add('focused');
+        });
     </script>
 </body>
 </html>
